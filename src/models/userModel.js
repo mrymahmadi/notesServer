@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { type } = require("os");
+const noteSchema = require("./notesModel");
 
 const Schema = mongoose.Schema;
 
@@ -20,6 +21,7 @@ const user = new mongoose.Schema(
     phone: {
       type: String,
       require: true,
+      unique: true,
     },
     Role: {
       type: String,
@@ -28,9 +30,20 @@ const user = new mongoose.Schema(
     },
     notes: [
       {
-        note: { type: Schema.Types.ObjectId, ref: "note" },
+        title: { type: String },
+        description: { type: String },
+        lable: {
+          type: String,
+          enum: [mongoose.Schema.Types.String, "ALL"],
+          ref: "label",
+          default: "ALL",
+        },
         createdAt: { type: Date, default: Date.now },
       },
+      /*  {
+        note: { type: Schema.Types.ObjectId, ref: "note" },
+        createdAt: { type: Date, default: Date.now },
+      },*/
     ],
   },
   {
