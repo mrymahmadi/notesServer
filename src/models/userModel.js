@@ -45,6 +45,20 @@ const user = new mongoose.Schema(
         createdAt: { type: Date, default: Date.now },
       },*/
     ],
+
+    tasks: [
+      {
+        content: {
+          type: String,
+          require: true,
+        },
+        done: {
+          type: Boolean,
+          default: false,
+        },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,

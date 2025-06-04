@@ -20,5 +20,5 @@ const task = new Schema(
   }
 );
 
-const model = mongoose.model("lable", lable);
+const model = mongoose.model("task", task);
 module.exports = model;

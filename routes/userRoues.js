@@ -29,4 +29,11 @@ router.post(
   userCtrl.addNote
 );
 
+router.put("/editNote", checkAuthAndRole("USER"), userCtrl.editNote);
+
+router.get("/allNotes", checkAuthAndRole("USER"), userCtrl.allNotes);
+
+router.get("/oneNote/:_id", checkAuthAndRole("USER"), userCtrl.oneNote);
+
+router.post("/addTask", checkAuthAndRole("USER"), userCtrl.addTask);
 module.exports = router;

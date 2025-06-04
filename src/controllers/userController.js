@@ -1,7 +1,14 @@
 const userModel = require("../models/userModel");
 const noteModel = require("../models/notesModel");
-const { generateToken, verifyToken } = require("../utils/payloads");
+const taskModel = require("../models/taskModel");
+const {
+  generateToken,
+  verifyToken,
+  generatePayload,
+} = require("../utils/payloads");
 const bcrypt = require("bcryptjs");
+const { Types } = require("mongoose");
+const checkAuthAndRole = require("../middlewares/authMiddleware");
 
 class userCtrl {
   signUp = async (req, res) => {
@@ -70,11 +77,13 @@ class userCtrl {
   };
 
   addNote = async (req, res) => {
-    const { title, description, lable } = req.body;
+    const { title, description, lable, owner } = req.body;
     const imageUrl = req.file ? `/uploads/${req.file.fileName}` : null;
 
-    if (!title || !description) {
-      return res.json("مقادیر عنوان و توضیحات نوت شما وارد نشده است.");
+    if (!title || !description || !owner) {
+      return res.json(
+        "مقادیر عنوان و توضیحات یا ایدی سازنده یادداشت شما وارد نشده است."
+      );
     }
 
     try {
@@ -82,7 +91,7 @@ class userCtrl {
         title,
         description,
         lable,
-        owner: req.userId,
+        owner,
         imageUrl,
       });
 
@@ -99,6 +108,125 @@ class userCtrl {
       return res.json(updateUser);
     } catch {
       return res.json("مشکلی پیش امد");
+    }
+  };
+
+  editNote = async (req, res) => {
+    try {
+      const { _id, title, description, lable, imageUrl } = req.body;
+
+      // 1. بررسی وجود بدنه درخواست
+      if (!req.body || Object.keys(req.body).length === 0) {
+        return res
+          .status(400)
+          .json({ message: "هیچ داده‌ای برای آپدیت ارسال نشده است" });
+      }
+
+      // 2. بررسی وجود آیدی
+      if (!_id) {
+        return res.status(400).json({ message: "فیلد _id الزامی است" });
+      }
+
+      // 3. بررسی معتبر بودن آیدی
+      if (!Types.ObjectId.isValid(_id)) {
+        return res.status(400).json({ message: "آیدی نامعتبر است" });
+      }
+
+      // 4. بررسی وجود یادداشت
+      const findNote = await noteModel.findById(_id);
+      if (!findNote) {
+        return res.status(404).json({ message: "یادداشت مورد نظر یافت نشد" });
+      }
+
+      // 5. ساخت آبجکت آپدیت
+      const updateData = {};
+      if (title !== undefined) updateData.title = title;
+      if (description !== undefined) updateData.description = description;
+      if (lable !== undefined) updateData.lable = lable;
+      if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
+
+      // 6. اگر هیچ فیلدی برای آپدیت وجود ندارد
+      if (Object.keys(updateData).length === 0) {
+        return res
+          .status(400)
+          .json({ message: "هیچ فیلد معتبری برای آپدیت ارسال نشده است" });
+      }
+
+      // 7. انجام آپدیت
+      const updatedNote = await noteModel.findByIdAndUpdate(
+        _id,
+        { $set: updateData },
+        { new: true }
+      );
+
+      return res.status(200).json({
+        message: "آپدیت با موفقیت انجام شد",
+        data: updatedNote,
+      });
+    } catch (error) {
+      console.error("خطا در آپدیت یادداشت:", error);
+      return res.status(500).json({ message: "خطای سرور در پردازش درخواست" });
+    }
+  };
+
+  allNotes = async (req, res) => {
+    try {
+      const notes = await noteModel.find();
+      return res.status(200).json(notes);
+    } catch {
+      return res.status(201).json("خطایی سمت سرور وجود دارد");
+    }
+  };
+
+  oneNote = async (req, res) => {
+    const _id = req.params._id;
+    try {
+      const findNote = await noteModel.findById(_id);
+
+      if (!findNote) {
+        return res.status(501).json(" یادداشت یافت نشد");
+      }
+
+      return res.status(200).json(findNote);
+    } catch {
+      return res.status(201).json("مشکلی سمت سرور وجود دارد");
+    }
+  };
+
+  addTask = async (req, res) => {
+    const { content, userId } = req.body;
+
+    if (!content || !userId || Object.keys(req.body).length === 0) {
+      return res
+        .status(400)
+        .json({ message: "داده های مورد نیاز وارد نشده است" });
+    }
+
+    if (!Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "آیدی نامعتبر است" });
+    }
+
+    const existUser = await userModel.exists({ _id: userId });
+
+    if (!existUser) {
+      return res.status(201).json({ response: "چنین کاربری یافت نشد" });
+    }
+
+    try {
+      const newTask = await taskModel.create({
+        content,
+        userId,
+      });
+
+      const updateUser = await userModel.findByIdAndUpdate(
+        userId,
+        { $push: { tasks: { content } } },
+        { new: true }
+      );
+
+      return res.status(200).json(updateUser);
+    } catch {
+      res.status(201).json("مشکل سمت سرور ");
     }
   };
 }
