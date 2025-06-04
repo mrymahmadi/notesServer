@@ -10,12 +10,14 @@ const winston = require("winston");
 const schedule = require("node-schedule");
 const bodyParser = require("body-parser");
 const rateLimit = require("express-rate-limit");
+const mongoose = require("mongoose");
+const multer = require("multer");
+
 const app = express();
 const server = new http.Server(app);
 const log = console.log;
 const os = require("os");
-const mongoose = require("mongoose");
-const multer = require("multer");
+
 const totalMemory = os.totalmem();
 const freeMemory = os.freemem();
 log("totalMemory : ".red + totalMemory);
@@ -53,6 +55,8 @@ class Application {
 
     //secret req port
 
+    require("./swagger-setup")(app);
+    app.use("/uploads", express.static(path.join(__dirname, "uploads")));
     app.use("/", routes);
   }
 

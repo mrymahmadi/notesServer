@@ -1,7 +1,6 @@
 const userModel = require("../models/userModel");
 const noteModel = require("../models/notesModel");
 const { generateToken, verifyToken } = require("../utils/payloads");
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 class userCtrl {
@@ -66,15 +65,16 @@ class userCtrl {
       });
     } catch (err) {
       console.error("Signin Error:", err);
-      res.status(500).json("خطای سرور");
+      return res.status(500).json("خطای سرور");
     }
   };
 
   addNote = async (req, res) => {
     const { title, description, lable } = req.body;
+    const imageUrl = req.file ? `/uploads/${req.file.fileName}` : null;
 
     if (!title || !description) {
-      res.json("مقادیر عنوان و توضیحات نوت شما وارد نشده است.");
+      return res.json("مقادیر عنوان و توضیحات نوت شما وارد نشده است.");
     }
 
     try {
@@ -83,29 +83,22 @@ class userCtrl {
         description,
         lable,
         owner: req.userId,
+        imageUrl,
       });
 
       if (!newNote) {
-        res.status(201).json("مشکلی در فرایند ذخیره یادداشت پیش آمد");
+        return res.status(201).json("مشکلی در فرایند ذخیره یادداشت پیش آمد");
       }
 
       const updateUser = await userModel.findOneAndUpdate(
-        req.userId, // فیلتر
-        { $push: { notes: { title, description, lable } } }, // آپدیت
+        req.userId,
+        { $push: { notes: { title, description, lable, imageUrl } } },
         { new: true }
       );
-      /*const updateUserModel = await userModel.findByIdAndUpdate(
-        
-        { 
-          $push: { notes: newNote._id },
-        },
-        { new: true }
-      );
-*/
 
-      res.json(updateUser);
+      return res.json(updateUser);
     } catch {
-      res.json("مشکلی پیش امد");
+      return res.json("مشکلی پیش امد");
     }
   };
 }
