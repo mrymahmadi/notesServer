@@ -66,7 +66,6 @@ class Application {
     server.listen(port, (err) => {
       if (err) console.log(err);
       else console.log("app listen to port : ".blue + port);
-      log("condition: ".gray);
     });
   }
 }

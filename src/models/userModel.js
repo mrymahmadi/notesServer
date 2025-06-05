@@ -32,7 +32,7 @@ const user = new mongoose.Schema(
       {
         title: { type: String },
         description: { type: String },
-        lable: {
+        label: {
           type: String,
           enum: [mongoose.Schema.Types.String, "ALL"],
           ref: "label",

@@ -3,16 +3,22 @@ const { type } = require("os");
 
 const Schema = mongoose.Schema;
 
-const lable = new Schema(
+const label = new Schema(
   {
     name: {
       type: String,
       require: true,
       unique: true,
     },
+    notes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "note",
+      },
+    ],
   },
   { timestamps: true }
 );
 
-const model = mongoose.model("lable", lable);
+const model = mongoose.model("label", label);
 module.exports = model;

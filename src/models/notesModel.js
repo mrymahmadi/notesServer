@@ -16,12 +16,13 @@ const note = new Schema(
     photo: {
       type: String,
     },
-    lable: {
-      type: String,
-      enum: [mongoose.Schema.Types.String, "ALL"],
-      ref: "label",
-      default: "ALL",
-    },
+    labels: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "label",
+        default: "ALL",
+      },
+    ],
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
   },
   { timestamps: true }
