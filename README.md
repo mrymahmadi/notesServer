@@ -1,5 +1,13 @@
 # notesServer
 
+## Setup
+
+After cloning the project, run:
+
+```
+npm install
+````
+
 # Running the Project with Docker Compose
 
 1. Make sure Docker and Docker Compose are installed on your system.
