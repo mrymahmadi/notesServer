@@ -25,8 +25,7 @@ log("freeMemory : ".magenta + freeMemory);
 require("express-async-errors");
 require("winston-mongodb");
 
-//const url = "mongodb://localhost:27017/NoteApp";
-const url = process.env.MONGO_URL || "mongodb://localhost:27017/NoteApp";
+const url = "mongodb://localhost:27017/NoteApp";
 
 class Application {
   constructor() {
@@ -42,7 +41,7 @@ class Application {
         console.log("Connected Success");
       })
       .catch((err) => {
-        console.log("Error in the Connection", err);
+        console.log("Error in the Connection");
       });
   }
 

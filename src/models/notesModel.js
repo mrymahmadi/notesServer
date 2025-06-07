@@ -13,7 +13,7 @@ const note = new Schema(
       type: String,
       require: true,
     },
-    photo: {
+    imageUrl: {
       type: String,
     },
     labels: [
