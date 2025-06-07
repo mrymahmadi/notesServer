@@ -1,7 +1,7 @@
-const express = required("express");
+const express = require("express");
 const router = express.Router();
-const adminCtrl = required("../src/controllers/adminController");
-const checkAuthAndRole = required("../src/middlewares/authMiddleware");
+const adminCtrl = require("../src/controllers/adminController");
+const checkAuthAndRole = require("../src/middlewares/authMiddleware");
 
 /**
  * @swagger
@@ -12,12 +12,12 @@ const checkAuthAndRole = required("../src/middlewares/authMiddleware");
  *     tags:
  *       - Admin
  *     requestBody:
- *       requiredd: true
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             requiredd:
+ *             required:
  *               - lastName
  *               - firstName
  *               - password
@@ -79,12 +79,12 @@ router.post("/signUp", adminCtrl.signUp);
  *     tags:
  *       - Admin
  *     requestBody:
- *       requiredd: true
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             requiredd:
+ *             required:
  *               - phone
  *               - password
  *             properties:

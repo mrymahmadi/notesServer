@@ -1,2 +1,2 @@
-const Application = required("./app");
+const Application = require("./app");
 new Application();

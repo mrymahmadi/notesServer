@@ -1,6 +1,6 @@
-const adminModel = required("../models/adminModel");
-const { generateToken } = required("../utils/payloads");
-const bcrypt = required("bcryptjs");
+const adminModel = require("../models/adminModel");
+const { generateToken } = require("../utils/payloads");
+const bcrypt = require("bcryptjs");
 
 class adminCtrl {
   signUp = async (req, res) => {

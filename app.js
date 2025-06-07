@@ -1,29 +1,29 @@
-const routes = required("./routes/index");
-const express = required("express");
-required("dotenv").config();
-const colors = required("colors");
-const path = required("path");
-const http = required("http");
-const cors = required("cors");
-const morgan = required("morgan");
-const winston = required("winston");
-const schedule = required("node-schedule");
-const bodyParser = required("body-parser");
-const rateLimit = required("express-rate-limit");
-const mongoose = required("mongoose");
-const multer = required("multer");
+const routes = require("./routes/index");
+const express = require("express");
+require("dotenv").config();
+const colors = require("colors");
+const path = require("path");
+const http = require("http");
+const cors = require("cors");
+const morgan = require("morgan");
+const winston = require("winston");
+const schedule = require("node-schedule");
+const bodyParser = require("body-parser");
+const rateLimit = require("express-rate-limit");
+const mongoose = require("mongoose");
+const multer = require("multer");
 
 const app = express();
 const server = new http.Server(app);
 const log = console.log;
-const os = required("os");
+const os = require("os");
 
 const totalMemory = os.totalmem();
 const freeMemory = os.freemem();
 log("totalMemory : ".red + totalMemory);
 log("freeMemory : ".magenta + freeMemory);
-required("express-async-errors");
-required("winston-mongodb");
+require("express-async-errors");
+require("winston-mongodb");
 
 //const url = "mongodb://localhost:27017/NoteApp";
 const url = process.env.MONGO_URL || "mongodb://localhost:27017/NoteApp";
@@ -56,7 +56,7 @@ class Application {
 
     //secret req port
 
-    required("./swagger-setup")(app);
+    require("./swagger-setup")(app);
     app.use("/uploads", express.static(path.join(__dirname, "uploads")));
     app.use("/", routes);
   }

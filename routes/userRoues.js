@@ -1,8 +1,8 @@
-const express = required("express");
+const express = require("express");
 const router = express.Router();
-const userCtrl = required("../src/controllers/userController");
-const checkAuthAndRole = required("../src/middlewares/authMiddleware");
-const uploadImage = required("../src/middlewares/upload");
+const userCtrl = require("../src/controllers/userController");
+const checkAuthAndRole = require("../src/middlewares/authMiddleware");
+const uploadImage = require("../src/middlewares/upload");
 
 /**
  * @swagger
@@ -13,12 +13,12 @@ const uploadImage = required("../src/middlewares/upload");
  *     tags:
  *       - Auth
  *     requestBody:
- *       requiredd: true
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             requiredd:
+ *             required:
  *               - lastName
  *               - firstName
  *               - password
@@ -80,12 +80,12 @@ router.post("/signUp", userCtrl.signUp);
  *     tags:
  *       - Auth
  *     requestBody:
- *       requiredd: true
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             requiredd:
+ *             required:
  *               - phone
  *               - password
  *             properties:
@@ -139,12 +139,12 @@ router.post("/signIn", userCtrl.signIn);
  *     tags:
  *       - Notes
  *     requestBody:
- *       requiredd: true
+ *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
  *             type: object
- *             requiredd:
+ *             required:
  *               - title
  *               - description
  *               - owner
@@ -208,12 +208,12 @@ router.post(
  *     tags:
  *       - Notes
  *     requestBody:
- *       requiredd: true
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             requiredd:
+ *             required:
  *               - _id
  *             properties:
  *               _id:
@@ -346,7 +346,7 @@ router.get("/allNotes", checkAuthAndRole("USER"), userCtrl.allNotes);
  *     parameters:
  *       - in: path
  *         name: _id
- *         requiredd: true
+ *         required: true
  *         description: آیدی یادداشت
  *         schema:
  *           type: string
@@ -399,12 +399,12 @@ router.get("/oneNote/:_id", checkAuthAndRole("USER"), userCtrl.oneNote);
  *     tags:
  *       - Tasks
  *     requestBody:
- *       requiredd: true
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             requiredd:
+ *             required:
  *               - content
  *               - userId
  *             properties:
@@ -478,18 +478,18 @@ router.post("/addTask", checkAuthAndRole("USER"), userCtrl.addTask);
  *     parameters:
  *       - in: path
  *         name: _id
- *         requiredd: true
+ *         required: true
  *         description: آیدی تسک
  *         schema:
  *           type: string
  *           example: 665f21d2a3e99c5d7890b123
  *     requestBody:
- *       requiredd: true
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             requiredd:
+ *             required:
  *               - userId
  *             properties:
  *               userId:
@@ -516,12 +516,12 @@ router.put("/doneTask/:_id", checkAuthAndRole("USER"), userCtrl.doneTask);
  *     tags:
  *       - Labels
  *     requestBody:
- *       requiredd: true
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             requiredd:
+ *             required:
  *               - name
  *             properties:
  *               name:
@@ -570,12 +570,12 @@ router.post("/addLabel", checkAuthAndRole("USER"), userCtrl.addLabel);
  *     tags:
  *       - Notes
  *     requestBody:
- *       requiredd: true
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             requiredd:
+ *             required:
  *               - name
  *               - noteId
  *             properties:

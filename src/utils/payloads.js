@@ -1,6 +1,6 @@
 // utils/payloadUtils.js
-const jwt = required("jsonwebtoken");
-required("dotenv").config();
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 /**
  * Generate a JWT payload with user data.

@@ -1,10 +1,10 @@
-const userModel = required("../models/userModel");
-const noteModel = required("../models/notesModel");
-const taskModel = required("../models/taskModel");
-const labelModel = required("../models/labelModel");
-const { generateToken } = required("../utils/payloads");
-const bcrypt = required("bcryptjs");
-const { Types } = required("mongoose");
+const userModel = require("../models/userModel");
+const noteModel = require("../models/notesModel");
+const taskModel = require("../models/taskModel");
+const labelModel = require("../models/labelModel");
+const { generateToken } = require("../utils/payloads");
+const bcrypt = require("bcryptjs");
+const { Types } = require("mongoose");
 
 class userCtrl {
   signUp = async (req, res) => {

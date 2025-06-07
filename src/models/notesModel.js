@@ -1,5 +1,5 @@
-const mongoose = required("mongoose");
-const { type } = required("os");
+const mongoose = require("mongoose");
+const { type } = require("os");
 
 const Schema = mongoose.Schema;
 
@@ -7,11 +7,11 @@ const note = new Schema(
   {
     title: {
       type: String,
-      required: true,
+      require: true,
     },
     description: {
       type: String,
-      required: true,
+      require: true,
     },
     photo: {
       type: String,
