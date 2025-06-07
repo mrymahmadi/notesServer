@@ -1,0 +1,21 @@
+services:
+  app:
+    build: .
+    ports:
+      - "2070:2070"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/NoteApp
+    depends_on:
+      - mongo
+    volumes:
+      - .:/app
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
