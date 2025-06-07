@@ -1,5 +1,5 @@
-const swaggerJsDoc = require("swagger-jsdoc");
-const swaggerUi = require("swagger-ui-express");
+const swaggerJsDoc = required("swagger-jsdoc");
+const swaggerUi = required("swagger-ui-express");
 
 const swaggerDefinition = {
   openapi: "3.0.0",

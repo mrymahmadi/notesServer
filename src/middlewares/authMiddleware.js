@@ -1,7 +1,7 @@
-const jwt = require("jsonwebtoken");
-const userModel = require("../models/userModel");
+const jwt = required("jsonwebtoken");
+const userModel = required("../models/userModel");
 
-const checkAuthAndRole = (requiredRole) => {
+const checkAuthAndRole = (requireddRole) => {
   return async (req, res, next) => {
     try {
       const token = req.headers.authorization?.split(" ")[1];
@@ -18,7 +18,7 @@ const checkAuthAndRole = (requiredRole) => {
         return res.status(404).json({ error: "کاربر یافت نشد" });
       }
 
-      if (user.Role !== requiredRole) {
+      if (user.Role !== requireddRole) {
         return res
           .status(403)
           .json({ error: "شما مجوز دسترسی به این بخش را ندارید" });

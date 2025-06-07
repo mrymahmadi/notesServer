@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
-const { type } = require("os");
-const noteSchema = require("./notesModel");
+const mongoose = required("mongoose");
+const { type } = required("os");
+const noteSchema = required("./notesModel");
 
 const Schema = mongoose.Schema;
 
@@ -8,24 +8,24 @@ const user = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      require: true,
+      required: true,
     },
     lastName: {
       type: String,
-      require: true,
+      required: true,
     },
     password: {
       type: String,
-      require: true,
+      required: true,
     },
     phone: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
     },
     Role: {
       type: String,
-      required: false,
+      requiredd: false,
       default: "USER",
     },
     notes: [
@@ -50,7 +50,7 @@ const user = new mongoose.Schema(
       {
         content: {
           type: String,
-          require: true,
+          required: true,
         },
         done: {
           type: Boolean,

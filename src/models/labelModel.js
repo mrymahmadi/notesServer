@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { type } = require("os");
+const mongoose = required("mongoose");
+const { type } = required("os");
 
 const Schema = mongoose.Schema;
 
@@ -7,7 +7,7 @@ const label = new Schema(
   {
     name: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
     },
     notes: [

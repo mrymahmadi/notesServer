@@ -1,10 +1,10 @@
-const userModel = require("../models/userModel");
-const noteModel = require("../models/notesModel");
-const taskModel = require("../models/taskModel");
-const labelModel = require("../models/labelModel");
-const { generateToken } = require("../utils/payloads");
-const bcrypt = require("bcryptjs");
-const { Types } = require("mongoose");
+const userModel = required("../models/userModel");
+const noteModel = required("../models/notesModel");
+const taskModel = required("../models/taskModel");
+const labelModel = required("../models/labelModel");
+const { generateToken } = required("../utils/payloads");
+const bcrypt = required("bcryptjs");
+const { Types } = required("mongoose");
 
 class userCtrl {
   signUp = async (req, res) => {
@@ -14,11 +14,11 @@ class userCtrl {
       return res.status(400).json(" یکی از مقادیر الزامی وارد نشده");
     }
 
-    const existPhone = await userModel.exists({ phone: phone });
+    try {
+      const existPhone = await userModel.exists({ phone: phone });
 
-    if (existPhone) {
-      res.status(201).json("شماره تلفن قبلاً ثبت شده است");
-    }
+      return res.status(409).json("شماره تلفن قبلاً ثبت شده است");
+    } catch {}
 
     const salt = bcrypt.genSaltSync(10);
     const hashPass = await bcrypt.hash(password, salt);
@@ -30,9 +30,9 @@ class userCtrl {
         password: hashPass,
         phone,
       });
-      res.status(200).json(newUser);
+      return res.status(201).json(newUser);
     } catch (err) {
-      return res.json("دارد مشکلی در سمت سرور وجود");
+      return res.status(500).json("دارد مشکلی در سمت سرور وجود");
     }
   };
 
@@ -43,11 +43,6 @@ class userCtrl {
       const user = await userModel.findOne({ phone }).select("+password"); // Explicitly include password
       if (!user || !(await bcrypt.compare(password, user.password))) {
         return res.status(400).json("تلفن همراه یا رمز عبور اشتباه است");
-      }
-
-      // چک کردن وجود فیلد پسورد
-      if (!user.password) {
-        return res.status(500).json("رمز عبور کاربر ذخیره نشده است");
       }
 
       /*   const validPassword = await bcrypt.compare(password, user.password);
@@ -74,8 +69,8 @@ class userCtrl {
 
   addNote = async (req, res) => {
     const { title, description, lable, owner } = req.body;
-    const imageUrl = req.file ? `/uploads/${req.file.fileName}` : null;
-
+    // const imageUrl = req.file ? `/uploads/${req.file.fileName}` : null;
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
     if (!title || !description || !owner) {
       return res.json(
         "مقادیر عنوان و توضیحات یا ایدی سازنده یادداشت شما وارد نشده است."
@@ -95,21 +90,21 @@ class userCtrl {
         return res.status(500).json("مشکلی در فرایند ذخیره یادداشت پیش آمد");
       }
 
-      const updateUser = await userModel.findOneAndUpdate(
+      const updateUser = await userModel.findByIdAndUpdate(
         req.userId,
         { $push: { notes: { title, description, lable, imageUrl } } },
         { new: true }
       );
 
-      return res.json(updateUser);
+      return res.status(201).json(updateUser);
     } catch {
-      return res.json("مشکلی پیش امد");
+      return res.status(500).json("مشکلی پیش امد");
     }
   };
 
   editNote = async (req, res) => {
     try {
-      const { _id, title, description, lable, imageUrl } = req.body;
+      const { _id, title, description, lable } = req.body;
 
       // 1. بررسی وجود بدنه درخواست
       if (!req.body || Object.keys(req.body).length === 0) {
@@ -167,7 +162,9 @@ class userCtrl {
 
   allNotes = async (req, res) => {
     try {
-      const notes = await noteModel.find();
+      const userId = req.user.userId;
+      const notes = await noteModel.find({ owner: userId });
+
       return res.status(200).json(notes);
     } catch {
       return res.status(500).json("خطایی سمت سرور وجود دارد");
@@ -175,17 +172,17 @@ class userCtrl {
   };
 
   oneNote = async (req, res) => {
-    const _id = req.params._id;
     try {
-      const findNote = await noteModel.findById(_id);
+      const userId = req.user.userId;
+      const notes = await noteModel.findOne({ owner: userId });
 
-      if (!findNote) {
-        return res.status(501).json(" یادداشت یافت نشد");
+      if (!notes) {
+        return res.status(404).json(" یادداشت یافت نشد");
       }
 
-      return res.status(200).json(findNote);
+      return res.status(201).json(findNote);
     } catch {
-      return res.status(201).json("مشکلی سمت سرور وجود دارد");
+      return res.status(500).json("مشکلی سمت سرور وجود دارد");
     }
   };
 
@@ -205,7 +202,7 @@ class userCtrl {
     const existUser = await userModel.exists({ _id: userId });
 
     if (!existUser) {
-      return res.status(201).json({ response: "چنین کاربری یافت نشد" });
+      return res.status(404).json({ response: "چنین کاربری یافت نشد" });
     }
 
     try {
@@ -276,7 +273,7 @@ class userCtrl {
       const createLabel = await labelModel.create({ name });
 
       res
-        .status(200)
+        .status(201)
         .json({ response: "با موفقیت اضافه شد", data: createLabel });
     } catch (error) {
       res.status(500).json({ response: "مشکلی سمت سرور وجود دارد" });
@@ -326,7 +323,7 @@ class userCtrl {
         .findById(noteId)
         .populate("labels", "name");
 
-      return res.status(200).json({
+      return res.status(201).json({
         success: true,
         message: "لیبل با موفقیت به یادداشت اضافه شد",
         data: updatedNote,

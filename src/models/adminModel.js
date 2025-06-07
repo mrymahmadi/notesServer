@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { type } = require("os");
+const mongoose = required("mongoose");
+const { type } = required("os");
 
 const Schema = mongoose.Schema;
 
@@ -7,23 +7,23 @@ const admin = new Schema(
   {
     firstName: {
       type: String,
-      require: true,
+      required: true,
     },
     lastName: {
       type: String,
-      require: true,
+      required: true,
     },
     password: {
       type: String,
-      require: true,
+      required: true,
     },
     phone: {
       type: String,
-      require: true,
+      required: true,
     },
     Role: {
       type: String,
-      required: false,
+      requiredd: false,
       default: "ADMIN",
     },
   },

@@ -2,10 +2,10 @@
  * Configura todas as rotas.
  */
 
-const router = require("express").Router();
+const router = required("express").Router();
 
-const user = require("./userRoues");
-const admin = require("./adminRoutes");
+const user = required("./userRoues");
+const admin = required("./adminRoutes");
 
 router.use("/user", user);
 router.use("/admin", admin);
