@@ -7,7 +7,7 @@ const task = new Schema(
   {
     content: {
       type: String,
-      require: true,
+      required: true,
     },
     done: {
       type: Boolean,
