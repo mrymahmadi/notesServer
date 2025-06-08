@@ -41,26 +41,19 @@ const uploadImage = require("../src/middlewares/upload");
  *                 example: "09121234567"
  *                 description: شماره تلفن کاربر (منحصربفرد)
  *     responses:
- *       200:
+ *       201:
  *         description: ثبت‌نام موفق
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/User'
- *       201:
- *         description: شماره تلفن قبلاً ثبت شده است
- *         content:
- *           application/json:
- *             schema:
- *               type: string
- *               example: شماره تلفن قبلاً ثبت شده است
  *       400:
- *         description: مقادیر الزامی وارد نشده‌اند
+ *         description:  شماره تلفن قبلاً ثبت شده است یا یکی از مقادیر الزامی وارد نشده است
  *         content:
  *           application/json:
  *             schema:
  *               type: string
- *               example: یکی از مقادیر الزامی وارد نشده
+ *
  *       500:
  *         description: خطا در سرور
  *         content:
@@ -98,7 +91,7 @@ router.post("/signUp", userCtrl.signUp);
  *                 example: "123456"
  *                 description: رمز عبور کاربر
  *     responses:
- *       200:
+ *       201:
  *         description: ورود موفق و ارسال توکن
  *         content:
  *           application/json:
@@ -170,7 +163,7 @@ router.post("/signIn", userCtrl.signIn);
  *                 format: binary
  *                 description: تصویر مربوط به یادداشت (اختیاری)
  *     responses:
- *       200:
+ *       201:
  *         description: یادداشت با موفقیت ایجاد و کاربر آپدیت شد
  *         content:
  *           application/json:
@@ -319,7 +312,7 @@ router.put("/editNote", checkAuthAndRole("USER"), userCtrl.editNote);
  *                     type: string
  *                   photo:
  *                     type: string
- *                   labels:
+ *                   lables:
  *                     type: array
  *                     items:
  *                       type: string
@@ -367,20 +360,20 @@ router.get("/allNotes", checkAuthAndRole("USER"), userCtrl.allNotes);
  *                   type: string
  *                 photo:
  *                   type: string
- *                 labels:
+ *                 lables:
  *                   type: array
  *                   items:
  *                     type: string
  *                 owner:
  *                   type: string
- *       501:
+ *       404:
  *         description: یادداشت یافت نشد
  *         content:
  *           application/json:
  *             schema:
  *               type: string
  *               example: یادداشت یافت نشد
- *       201:
+ *       500:
  *         description: مشکل سمت سرور
  *         content:
  *           application/json:
@@ -417,7 +410,7 @@ router.get("/oneNote/:_id", checkAuthAndRole("USER"), userCtrl.oneNote);
  *                 example: 665f1e70b1234c2d50e2e7a5
  *                 description: آیدی کاربر
  *     responses:
- *       200:
+ *       201:
  *         description: تسک با موفقیت اضافه شد و اطلاعات به‌روزرسانی شده کاربر برگشت داده می‌شود
  *         content:
  *           application/json:
@@ -446,7 +439,7 @@ router.get("/oneNote/:_id", checkAuthAndRole("USER"), userCtrl.oneNote);
  *                 message:
  *                   type: string
  *                   example: داده های مورد نیاز وارد نشده است
- *       201:
+ *       404:
  *         description: کاربر یافت نشد
  *         content:
  *           application/json:
@@ -506,15 +499,104 @@ router.post("/addTask", checkAuthAndRole("USER"), userCtrl.addTask);
  *         description: "خطای داخلی سرور"
  */
 router.put("/doneTask/:_id", checkAuthAndRole("USER"), userCtrl.doneTask);
+/***
+ * @swagger
+ * /user/allTasks:
+ *   post:
+ *      tags:
+ *        - Tasks
+ *      summary: دریافت همه تسک‌های متعلق به کاربر
+ *      security:
+ *        - bearerAuth: []
+ *      responses:
+ *        200:
+ *          description: لیست تسک‌ها با موفقیت بازیابی شد
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    example: "تسک های شما:"
+ *                  tasks:
+ *                    type: array
+ *                    items:
+ *                      $ref: '#/components/schemas/Task'
+ *        404:
+ *          description: تسکی یافت نشد
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    example: "تسکی ندارید"
+ *        500:
+ *          description: خطای داخلی سرور
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: string
+ *                example: "خطایی سمت سرور وجود دارد"
+ */
+router.get("/allTasks", checkAuthAndRole("USER"), userCtrl.allTasks);
 
 /**
  * @swagger
- * /api/labels:
+ * user/oneTask/{id}:
+ *    get:
+ *      tags:
+ *        - Tasks
+ *      summary: دریافت یک تسک خاص با استفاده از آیدی
+ *      security:
+ *        - bearerAuth: []
+ *      parameters:
+ *        - name: id
+ *          in: path
+ *          required: true
+ *          schema:
+ *            type: string
+ *          description: آیدی تسک
+ *      responses:
+ *        200:
+ *          description: تسک با موفقیت یافت شد
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    example: "تسک شما:"
+ *                  task:
+ *                    $ref: '#/components/schemas/Task'
+ *        404:
+ *          description: تسک یافت نشد
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: string
+ *                example: "تسک یافت نشد"
+ *        500:
+ *          description: خطای داخلی سمت سرور
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: string
+ *                example: "مشکلی سمت سرور وجود دارد"
+ */
+router.get("/oneTask/:_id", checkAuthAndRole("USER"), userCtrl.oneTask);
+
+/**
+ * @swagger
+ * /user/lables:
  *   post:
  *     summary: ایجاد لیبل جدید
  *     description: این API یک لیبل جدید را با نام مشخص‌شده در دیتابیس ذخیره می‌کند.
  *     tags:
- *       - Labels
+ *       - lables
  *     requestBody:
  *       required: true
  *       content:
@@ -529,7 +611,7 @@ router.put("/doneTask/:_id", checkAuthAndRole("USER"), userCtrl.doneTask);
  *                 example: "فوری"
  *                 description: نام لیبل جدید
  *     responses:
- *       200:
+ *       201:
  *         description: لیبل با موفقیت ایجاد شد
  *         content:
  *           application/json:
@@ -559,11 +641,11 @@ router.put("/doneTask/:_id", checkAuthAndRole("USER"), userCtrl.doneTask);
  *       500:
  *         description: خطای سمت سرور
  */
-router.post("/addLabel", checkAuthAndRole("USER"), userCtrl.addLabel);
+router.post("/addlable", checkAuthAndRole("USER"), userCtrl.addlable);
 
 /**
  * @swagger
- * /api/notes/add-label:
+ * /api/notes/add-lable:
  *   post:
  *     summary: افزودن لیبل به یادداشت
  *     description: افزودن یک لیبل موجود به یادداشت با استفاده از نام لیبل و آیدی یادداشت.
@@ -608,7 +690,7 @@ router.post("/addLabel", checkAuthAndRole("USER"), userCtrl.addLabel);
  *                       type: string
  *                     description:
  *                       type: string
- *                     labels:
+ *                     lables:
  *                       type: array
  *                       items:
  *                         type: object
@@ -625,9 +707,9 @@ router.post("/addLabel", checkAuthAndRole("USER"), userCtrl.addLabel);
  *         description: خطای داخلی سرور
  */
 router.put(
-  "/addLabelToNote",
+  "/addlableToNote",
   checkAuthAndRole("USER"),
-  userCtrl.addLabelToNote
+  userCtrl.addlableToNote
 );
 
 module.exports = router;

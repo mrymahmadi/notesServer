@@ -16,14 +16,14 @@ const note = new Schema(
     imageUrl: {
       type: String,
     },
-    labels: [
+    lables: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "label",
+        ref: "lable",
         default: "ALL",
       },
     ],
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: "user", },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
   },
   { timestamps: true }
 );

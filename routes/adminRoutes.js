@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const adminCtrl = require("../src/controllers/adminController");
 const checkAuthAndRole = require("../src/middlewares/authMiddleware");
-
 /**
  * @swagger
  * /signUp:
@@ -26,27 +25,23 @@ const checkAuthAndRole = require("../src/middlewares/authMiddleware");
  *               lastName:
  *                 type: string
  *                 example: حسینی
- *                 description: نام خانوادگی ادمین
  *               firstName:
  *                 type: string
  *                 example: محمد
- *                 description: نام کوچک ادمین
  *               password:
  *                 type: string
  *                 example: "123456"
- *                 description: رمز عبور ادمین
  *               phone:
  *                 type: string
  *                 example: "09121234567"
- *                 description: شماره تلفن ادمین (منحصربفرد)
  *     responses:
- *       200:
+ *       201:
  *         description: ثبت‌نام موفق
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Admin'
- *       201:
+ *       409:
  *         description: شماره تلفن قبلاً ثبت شده است
  *         content:
  *           application/json:
@@ -66,8 +61,9 @@ const checkAuthAndRole = require("../src/middlewares/authMiddleware");
  *           application/json:
  *             schema:
  *               type: string
- *               example: دارد مشکلی در سمت سرور وجود
+ *               example: مشکلی در سمت سرور وجود دارد
  */
+
 router.post("/signUp", adminCtrl.signUp);
 
 /**
@@ -91,11 +87,9 @@ router.post("/signUp", adminCtrl.signUp);
  *               phone:
  *                 type: string
  *                 example: "09121234567"
- *                 description: شماره تلفن ثبت‌شده ادمین
  *               password:
  *                 type: string
  *                 example: "123456"
- *                 description: رمز عبور ادمین
  *     responses:
  *       200:
  *         description: ورود موفق و ارسال توکن
@@ -109,10 +103,9 @@ router.post("/signUp", adminCtrl.signUp);
  *                   example: ورود موفقیت‌آمیز بود
  *                 token:
  *                   type: string
- *                   description: توکن JWT
  *                 admin:
  *                   $ref: '#/components/schemas/AdminWithoutPassword'
- *       400:
+ *       401:
  *         description: شماره تلفن یا رمز عبور اشتباه است
  *         content:
  *           application/json:
@@ -127,5 +120,6 @@ router.post("/signUp", adminCtrl.signUp);
  *               type: string
  *               example: خطای سرور
  */
+
 router.post("/signIn", adminCtrl.signIn);
 module.exports = router;

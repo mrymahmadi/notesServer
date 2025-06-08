@@ -1,29 +1,29 @@
 const userModel = require("../models/userModel");
 const noteModel = require("../models/notesModel");
 const taskModel = require("../models/taskModel");
-const labelModel = require("../models/labelModel");
+const lableModel = require("../models/lableModel");
 const { generateToken } = require("../utils/payloads");
 const bcrypt = require("bcryptjs");
 const { Types } = require("mongoose");
 
 class userCtrl {
   signUp = async (req, res) => {
-    const { lastName, firstName, password, phone } = req.body;
-
-    if (!lastName || !firstName || !password || !phone) {
-      return res.status(400).json(" یکی از مقادیر الزامی وارد نشده");
-    }
-
     try {
+      const { lastName, firstName, password, phone } = req.body;
+
+      if (!lastName || !firstName || !password || !phone) {
+        return res.status(400).json(" یکی از مقادیر الزامی وارد نشده");
+      }
+
       const existPhone = await userModel.exists({ phone: phone });
 
-      return res.status(409).json("شماره تلفن قبلاً ثبت شده است");
-    } catch {}
+      if (existPhone) {
+        return res.status(409).json("شماره تلفن قبلاً ثبت شده است");
+      }
 
-    const salt = bcrypt.genSaltSync(10);
-    const hashPass = await bcrypt.hash(password, salt);
+      const salt = bcrypt.genSaltSync(10);
+      const hashPass = await bcrypt.hash(password, salt);
 
-    try {
       const newUser = await userModel.create({
         lastName,
         firstName,
@@ -37,23 +37,17 @@ class userCtrl {
   };
 
   signIn = async (req, res) => {
-    const { password, phone } = req.body;
-
     try {
-      const user = await userModel.findOne({ phone }).select("+password"); // Explicitly include password
+      const { password, phone } = req.body;
+
+      const user = await userModel.findOne({ phone }).select("+password");
       if (!user || !(await bcrypt.compare(password, user.password))) {
         return res.status(400).json("تلفن همراه یا رمز عبور اشتباه است");
       }
 
-      /*   const validPassword = await bcrypt.compare(password, user.password);
-      if (!validPassword) {
-        return res.status(400).json("تلفن همراه یا رمز عبور اشتباه است");
-      }
-*/
+      const token = generateToken(user);
 
-      const token = generateToken(user); //ساخت توکن
-
-      const userWithoutPassword = user.toObject(); //حذف پسورد از ریسپانس جهت حفظ امنیت
+      const userWithoutPassword = user.toObject();
       delete userWithoutPassword.password;
 
       res.status(200).json({
@@ -68,16 +62,14 @@ class userCtrl {
   };
 
   addNote = async (req, res) => {
-    const { title, description, lable, owner } = req.body;
-    // const imageUrl = req.file ? `/uploads/${req.file.fileName}` : null;
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
-    if (!title || !description || !owner) {
-      return res.json(
-        "مقادیر عنوان و توضیحات یا ایدی سازنده یادداشت شما وارد نشده است."
-      );
-    }
-
     try {
+      const { title, description, lable } = req.body;
+      const owner = req.user._id;
+      const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+      if (!title || !description) {
+        return res.json("مقادیر عنوان و توضیحات یادداشت شما وارد نشده است.");
+      }
+
       const newNote = await noteModel.create({
         title,
         description,
@@ -96,7 +88,9 @@ class userCtrl {
         { new: true }
       );
 
-      return res.status(201).json(updateUser);
+      return res
+        .status(201)
+        .json({ message: "یادداشت با موفقیت اضافه شد", newNote });
     } catch {
       return res.status(500).json("مشکلی پیش امد");
     }
@@ -106,44 +100,36 @@ class userCtrl {
     try {
       const { _id, title, description, lable } = req.body;
 
-      // 1. بررسی وجود بدنه درخواست
       if (!req.body || Object.keys(req.body).length === 0) {
         return res
           .status(400)
           .json({ message: "هیچ داده‌ای برای آپدیت ارسال نشده است" });
       }
 
-      // 2. بررسی وجود آیدی
       if (!_id) {
         return res.status(400).json({ message: "فیلد _id الزامی است" });
       }
 
-      // 3. بررسی معتبر بودن آیدی
       if (!Types.ObjectId.isValid(_id)) {
         return res.status(400).json({ message: "آیدی نامعتبر است" });
       }
 
-      // 4. بررسی وجود یادداشت
       const findNote = await noteModel.findById(_id);
       if (!findNote) {
         return res.status(404).json({ message: "یادداشت مورد نظر یافت نشد" });
       }
 
-      // 5. ساخت آبجکت آپدیت
       const updateData = {};
       if (title !== undefined) updateData.title = title;
       if (description !== undefined) updateData.description = description;
       if (lable !== undefined) updateData.lable = lable;
-      if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
 
-      // 6. اگر هیچ فیلدی برای آپدیت وجود ندارد
       if (Object.keys(updateData).length === 0) {
         return res
           .status(400)
           .json({ message: "هیچ فیلد معتبری برای آپدیت ارسال نشده است" });
       }
 
-      // 7. انجام آپدیت
       const updatedNote = await noteModel.findByIdAndUpdate(
         _id,
         { $set: updateData },
@@ -162,10 +148,13 @@ class userCtrl {
 
   allNotes = async (req, res) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.user._id;
+      console.log(userId);
       const notes = await noteModel.find({ owner: userId });
 
-      return res.status(200).json(notes);
+      return res
+        .status(200)
+        .json({ message: "یادداشت های شما:", notes: notes });
     } catch {
       return res.status(500).json("خطایی سمت سرور وجود دارد");
     }
@@ -173,42 +162,31 @@ class userCtrl {
 
   oneNote = async (req, res) => {
     try {
-      const userId = req.user.userId;
-      const notes = await noteModel.findOne({ owner: userId });
+      const { _id } = req.params._id;
+      const note = await noteModel.findOne(_id);
 
-      if (!notes) {
+      if (!note) {
         return res.status(404).json(" یادداشت یافت نشد");
       }
 
-      return res.status(201).json(findNote);
+      return res.status(201).json({ message: "یادداشت شما:", note: note });
     } catch {
       return res.status(500).json("مشکلی سمت سرور وجود دارد");
     }
   };
 
   addTask = async (req, res) => {
-    const { content, userId } = req.body;
-
-    if (!content || !userId || Object.keys(req.body).length === 0) {
-      return res
-        .status(400)
-        .json({ message: "داده های مورد نیاز وارد نشده است" });
-    }
-
-    if (!Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ message: "آیدی نامعتبر است" });
-    }
-
-    const existUser = await userModel.exists({ _id: userId });
-
-    if (!existUser) {
-      return res.status(404).json({ response: "چنین کاربری یافت نشد" });
-    }
-
     try {
+      const { content } = req.body;
+      const userId = req.user._id;
+
+      if (!content || Object.keys(req.body).length === 0) {
+        return res.status(400).json({ message: "مقدار صحیحی وارد نشده است" });
+      }
+
       const newTask = await taskModel.create({
         content,
-        userId,
+        owner: userId,
       });
 
       const updateUser = await userModel.findByIdAndUpdate(
@@ -217,23 +195,25 @@ class userCtrl {
         { new: true }
       );
 
-      return res.status(200).json(updateUser);
+      return res
+        .status(200)
+        .json({ message: "برچسب با موفقیت اضافه شد", data: newTask });
     } catch {
       return res.status(500).json("مشکل سمت سرور ");
     }
   };
 
   doneTask = async (req, res) => {
-    const { userId } = req.body;
-    const _id = req.params._id;
-
     try {
+      const userId = req.user._id;
+      const _id = req.params._id;
+
       if (!Types.ObjectId.isValid(_id)) {
         return res.status(400).json({ message: "آیدی نامعتبر است" });
       }
 
-      const existUser = await userModel.findById(userId);
-      if (!existUser) {
+      const matchUser = await taskModel.find(userId);
+      if (!matchUser) {
         return res.status(404).json({ response: "چنین کاربری یافت نشد" });
       }
 
@@ -242,18 +222,25 @@ class userCtrl {
         return res.status(404).json({ response: "تسک یافت نشد" });
       }
 
-      const updateTask = await taskModel.findByIdAndUpdate(_id, {
-        $set: { done: true },
-      });
-
-      const updateUser = await userModel.findByIdAndUpdate(
-        existUser._id,
+      const done = true;
+      const updateTask = await taskModel.findByIdAndUpdate(
+        _id,
         {
-          $set: { "tasks.$[elem].done": true },
+          $set: { done: done },
         },
         {
           new: true,
-          arrayFilters: [{ "elem._id": findTask._id }],
+        }
+      );
+
+      const updateUser = await userModel.findByIdAndUpdate(
+        userId,
+        {
+          $set: { "tasks.$[elem].done": done },
+        },
+        {
+          new: true,
+          arrayFilters: [{ "elem._id": updateTask._id }],
         }
       );
 
@@ -266,24 +253,53 @@ class userCtrl {
     }
   };
 
-  addLabel = async (req, res) => {
-    const { name } = req.body;
-
+  allTasks = async (req, res) => {
     try {
-      const createLabel = await labelModel.create({ name });
+      const userId = req.user._id;
+      const ownTasks = await noteModel.find({ owner: userId });
+
+      if (!ownTasks) {
+        res.status(404).json({ message: "تسکی ندارید" });
+      }
+      return res.status(200).json({ message: "تسک های شما:", tasks: ownTasks });
+    } catch {
+      return res.status(500).json("خطایی سمت سرور وجود دارد");
+    }
+  };
+
+  oneTask = async (req, res) => {
+    try {
+      const { _id } = req.params._id;
+      const task = await taskModel.findOne(_id);
+
+      if (!note) {
+        return res.status(404).json(" تسک یافت نشد");
+      }
+
+      return res.status(201).json({ message: "تسک شما:", task: task });
+    } catch {
+      return res.status(500).json("مشکلی سمت سرور وجود دارد");
+    }
+  };
+
+  addlable = async (req, res) => {
+    try {
+      const { name } = req.body;
+
+      const createlable = await lableModel.create({ name });
 
       res
         .status(201)
-        .json({ response: "با موفقیت اضافه شد", data: createLabel });
+        .json({ response: "با موفقیت اضافه شد", data: createlable });
     } catch (error) {
       res.status(500).json({ response: "مشکلی سمت سرور وجود دارد" });
     }
   };
 
-  addLabelToNote = async (req, res) => {
-    const { name, noteId } = req.body;
-
+  addlableToNote = async (req, res) => {
     try {
+      const { name, noteId } = req.body;
+
       if (!name || !noteId) {
         return res.status(400).json({
           success: false,
@@ -299,8 +315,8 @@ class userCtrl {
         });
       }
 
-      const label = await labelModel.findOne({ name });
-      if (!label) {
+      const lable = await lableModel.findOne({ name });
+      if (!lable) {
         return res.status(404).json({
           success: false,
           message: "لیبل با این نام یافت نشد",
@@ -310,18 +326,18 @@ class userCtrl {
       await noteModel.findByIdAndUpdate(
         noteId,
         {
-          $addToSet: { labels: label._id },
+          $addToSet: { lables: lable._id },
         },
         { new: true }
       );
 
-      await labelModel.findByIdAndUpdate(label._id, {
+      await lableModel.findByIdAndUpdate(lable._id, {
         $addToSet: { notes: note._id },
       });
 
       const updatedNote = await noteModel
         .findById(noteId)
-        .populate("labels", "name");
+        .populate("lables", "name");
 
       return res.status(201).json({
         success: true,

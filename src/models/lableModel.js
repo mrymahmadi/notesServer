@@ -3,7 +3,7 @@ const { type } = require("os");
 
 const Schema = mongoose.Schema;
 
-const label = new Schema(
+const lable = new Schema(
   {
     name: {
       type: String,
@@ -20,5 +20,5 @@ const label = new Schema(
   { timestamps: true }
 );
 
-const model = mongoose.model("label", label);
+const model = mongoose.model("lable", lable);
 module.exports = model;

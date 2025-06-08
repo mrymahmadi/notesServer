@@ -32,10 +32,10 @@ const user = new mongoose.Schema(
       {
         title: { type: String },
         description: { type: String },
-        label: {
+        lable: {
           type: String,
           enum: [mongoose.Schema.Types.String, "ALL"],
-          ref: "label",
+          ref: "lable",
           default: "ALL",
         },
         createdAt: { type: Date, default: Date.now },
@@ -48,6 +48,11 @@ const user = new mongoose.Schema(
 
     tasks: [
       {
+        _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+        content: {
+          type: String,
+          required: true,
+        },
         content: {
           type: String,
           required: true,
