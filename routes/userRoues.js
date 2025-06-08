@@ -158,7 +158,7 @@ router.post("/signIn", userCtrl.signIn);
  *                 type: string
  *                 description: آیدی مالک یادداشت
  *                 example: 605c5d9f2f1b2c3a4d5e6789
- *               file:
+ *               image:
  *                 type: string
  *                 format: binary
  *                 description: تصویر مربوط به یادداشت (اختیاری)
