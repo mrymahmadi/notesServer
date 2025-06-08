@@ -8,19 +8,19 @@ const user = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      require: true,
+      required: true,
     },
     lastName: {
       type: String,
-      require: true,
+      required: true,
     },
     password: {
       type: String,
-      require: true,
+      required: true,
     },
     phone: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
     },
     Role: {
@@ -50,7 +50,7 @@ const user = new mongoose.Schema(
       {
         content: {
           type: String,
-          require: true,
+          required: true,
         },
         done: {
           type: Boolean,
