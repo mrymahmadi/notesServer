@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const adminCtrl = require("../src/controllers/adminController");
-const checkAuthAndRole = require("../src/middlewares/authMiddleware");
+
 /**
  * @swagger
  * /signUp:
