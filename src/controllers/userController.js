@@ -91,7 +91,7 @@ class userCtrl {
       }
 
       const updateUser = await userModel.findByIdAndUpdate(
-        req.userId,
+        owner,
         { $push: { notes: { title, description, lable, imageUrl } } },
         { new: true }
       );
