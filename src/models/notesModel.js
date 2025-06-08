@@ -7,11 +7,11 @@ const note = new Schema(
   {
     title: {
       type: String,
-      require: true,
+      required: true,
     },
     description: {
       type: String,
-      require: true,
+      required: true,
     },
     imageUrl: {
       type: String,
@@ -23,7 +23,7 @@ const note = new Schema(
         default: "ALL",
       },
     ],
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: "user", },
   },
   { timestamps: true }
 );
