@@ -256,7 +256,7 @@ class userCtrl {
   allTasks = async (req, res) => {
     try {
       const userId = req.user._id;
-      const ownTasks = await noteModel.find({ owner: userId });
+      const ownTasks = await taskModel.find({ owner: userId });
 
       if (!ownTasks) {
         res.status(404).json({ message: "تسکی ندارید" });
@@ -269,10 +269,10 @@ class userCtrl {
 
   oneTask = async (req, res) => {
     try {
-      const { _id } = req.params._id;
+      const _id = req.params._id;
       const task = await taskModel.findOne(_id);
 
-      if (!note) {
+      if (!task) {
         return res.status(404).json(" تسک یافت نشد");
       }
 

@@ -53,10 +53,6 @@ const user = new mongoose.Schema(
           type: String,
           required: true,
         },
-        content: {
-          type: String,
-          required: true,
-        },
         done: {
           type: Boolean,
           default: false,

@@ -9,9 +9,9 @@ require("dotenv").config();
  */
 const generatePayload = (user) => {
   return {
-    userId: user._id, // Always include the user ID
-    phone: user.phone, // Optional: Add other non-sensitive fields
-    role: user.role || "user", // Example: Default role
+    userId: user._id,
+    phone: user.phone,
+    role: user.Role || "user",
   };
 };
 
